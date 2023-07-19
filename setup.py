@@ -33,7 +33,4 @@ setup(
         'biosimulators-utils',
         'pytest',
     ],
-    tests_require=[
-        'pytest',
-    ],
 )
