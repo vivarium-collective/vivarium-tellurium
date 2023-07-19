@@ -9,5 +9,6 @@ vivarium_tellurium.egg-info/top_level.txt
 vivarium_tellurium/composites/__init__.py
 vivarium_tellurium/composites/injected_glc_phosphorylation.py
 vivarium_tellurium/experiments/__init__.py
+vivarium_tellurium/experiments/test_tellurium_process.py
 vivarium_tellurium/processes/__init__.py
 vivarium_tellurium/processes/tellurium_process.py
