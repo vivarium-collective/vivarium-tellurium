@@ -10,10 +10,6 @@ This is a toy example referenced in the documentation.
 
 from vivarium.core.engine import Engine
 from vivarium.core.composer import Composer
-from vivarium.library.pretty import format_dict
-from vivarium.processes.injector import Injector
-
-from template.processes.glucose_phosphorylation import GlucosePhosphorylation
 
 
 class InjectedGlcPhosphorylation(Composer):
@@ -34,14 +30,14 @@ class InjectedGlcPhosphorylation(Composer):
         super().__init__(config)
 
     def generate_processes(self, config):
-        injector = Injector(self.config['injector'])
+        '''injector = Injector(self.config['injector'])
         glucose_phosphorylation = GlucosePhosphorylation(
             self.config['glucose_phosphorylation'])
 
         return {
             'injector': injector,
             'glucose_phosphorylation': glucose_phosphorylation,
-        }
+        }'''
 
     def generate_topology(self, config):
         return {
