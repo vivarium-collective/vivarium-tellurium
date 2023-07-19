@@ -38,6 +38,7 @@ class InjectedGlcPhosphorylation(Composer):
             'injector': injector,
             'glucose_phosphorylation': glucose_phosphorylation,
         }'''
+        return None 
 
     def generate_topology(self, config):
         return {
