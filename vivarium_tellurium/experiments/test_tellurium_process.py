@@ -42,7 +42,3 @@ def test_tellurium():
 
     print(pp(data))
 
-
-
-if __name__ == '__main__':
-    test_tellurium()
