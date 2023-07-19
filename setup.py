@@ -7,29 +7,33 @@ with open("README.md", 'r') as readme:
     long_description = readme.read()
 
 setup(
-    name='',  # TODO: Put your package name here.
+    name='vivarium-tellurium',  
     version='0.0.1',
     packages=[
-        # TODO: Replace 'template' with the name of your folder.
-        'template',
-        'template.processes',
-        'template.composites',
-        'template.experiments',
+        'vivarium_tellurium',
+        'vivarium_tellurium.processes',
+        'vivarium_tellurium.composites',
+        'vivarium_tellurium.experiments',
     ],
-    author='',  # TODO: Put your name here.
-    author_email='',  # TODO: Put your email here.
-    url='',  # TODO: Put your project URL here.
-    license='',  # TODO: Choose a license.
+    author='Alex Patrie, Eran Agmon',  
+    author_email='', 
+    url='https://github.com/vivarium-collective/vivarium-tellurium',  
+    license='',  
     entry_points={
-        'console_scripts': []},
-    short_description='',  # TODO: Describe your project briefely.
+        'console_scripts': [],
+        },
+    short_description='A Vivarium interface for Tellurium', 
     long_description=long_description,
     long_description_content_type='text/markdown',
     package_data={},
     include_package_data=True,
     install_requires=[
-        'vivarium-core>=1.0.0',
+        'tellurium',
+        'vivarium-core',
+        'biosimulators-utils',
         'pytest',
-        # TODO: Add other dependencies.
+    ],
+    tests_require=[
+        'pytest',
     ],
 )
