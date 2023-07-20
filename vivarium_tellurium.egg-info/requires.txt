@@ -1,4 +1,0 @@
-tellurium
-vivarium-core
-biosimulators-utils
-pytest

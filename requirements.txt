@@ -15,25 +15,4 @@
 vivarium-core
 tellurium 
 biosimulators-utils 
-numpy>=1.23
-scipy>=1.5.1
-matplotlib>=2.0.2
-pandas>=0.20.2
-libroadrunner>=2.1
-rrplugins>=2.1; platform_system == "Windows"
-phrasedml>=1.0.9; (platform_machine != "arm64")
-antimony>=2.12.0
-sbml2matlab>=0.9.1; (python_version < '3.10' and platform_machine != "arm64")
-python-libsbml>=5.18.0
-python-libnuml>=1.0.0
-python-libsedml>=2.0.17
-python-libcombine>=0.2.2
-appdirs>=1.4.3
-jinja2>=3.0.0
-plotly>=2.0.12
-requests
-jupyter-client>=5.1.0
-jupyter-core>=4.3.0
-ipython
-ipykernel>=4.6.1
 pytest

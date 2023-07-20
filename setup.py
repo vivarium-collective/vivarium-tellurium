@@ -15,7 +15,7 @@ setup(
         'vivarium_tellurium.composites',
         'vivarium_tellurium.experiments',
     ],
-    author='Alex Patrie, Eran Agmon',  
+    author='Eran Agmon, Alexander Patrie',  
     author_email='', 
     url='https://github.com/vivarium-collective/vivarium-tellurium',  
     license='',  
