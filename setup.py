@@ -1,7 +1,5 @@
 # import os
-# import glob
-# import setuptools
-from distutils.core import setup
+from setuptools import setup
 
 with open("README.md", 'r') as readme:
     long_description = readme.read()
@@ -20,10 +18,9 @@ setup(
     author_email='',
     url='https://github.com/vivarium-collective/vivarium-tellurium',
     license='',
-    short_description='A Vivarium interface for Tellurium',
+    description='A Vivarium interface for Tellurium',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    package_data={},
     include_package_data=True,
     install_requires=[
         'vivarium-core',
