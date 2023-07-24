@@ -1,35 +1,30 @@
-import os
-import glob
-import setuptools
-from distutils.core import setup
+# import os
+from setuptools import setup
 
 with open("README.md", 'r') as readme:
     long_description = readme.read()
 
 setup(
-    name='',  # TODO: Put your package name here.
+    name='vivarium-tellurium',
     version='0.0.1',
     packages=[
-        # TODO: Replace 'template' with the name of your folder.
-        'template',
-        'template.processes',
-        'template.composites',
-        'template.experiments',
+        'vivarium_tellurium',
+        'vivarium_tellurium.composites',
+        'vivarium_tellurium.experiments',
+        'vivarium_tellurium.library',
+        'vivarium_tellurium.processes',
     ],
-    author='',  # TODO: Put your name here.
-    author_email='',  # TODO: Put your email here.
-    url='',  # TODO: Put your project URL here.
-    license='',  # TODO: Choose a license.
-    entry_points={
-        'console_scripts': []},
-    short_description='',  # TODO: Describe your project briefely.
+    author='Eran Agmon, Alexander Patrie',
+    author_email='',
+    url='https://github.com/vivarium-collective/vivarium-tellurium',
+    license='',
+    description='A Vivarium interface for Tellurium',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    package_data={},
     include_package_data=True,
     install_requires=[
-        'vivarium-core>=1.0.0',
+        'vivarium-core',
+        'tellurium',
         'pytest',
-        # TODO: Add other dependencies.
     ],
 )

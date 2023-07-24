@@ -1,16 +1,21 @@
+'''
+Execute by running: ``python template/processes/template_process.py``
+
+TODO: Replace the template code to implement your own process. 
+'''
+
 from vivarium.core.process import Process
-from vivarium.core.engine import Engine, pp
-
-# TODO import tellurium
+from vivarium.core.engine import Engine, pp 
 
 
-class TelluriumProcess(Process):
-    ''' Vivarium Process for Tellurium '''
+class Template(Process):
+    '''
+    This mock process provides a basic template that can be used for a new process
+    '''
 
     # declare default parameters as class variables
     defaults = {
-        'model_path': '',
-        'uptake_rate': 0.1,
+        'parameter1': 3.0,
     }
 
     def __init__(self, parameters=None):
@@ -32,7 +37,6 @@ class TelluriumProcess(Process):
         * `_serializer`
         '''
 
-        # TODO this needs to be done automatically by reading the tellurium model. Maybe study vivarium-biosimulators
         return {
             'internal': {
                 'A': {
@@ -50,37 +54,34 @@ class TelluriumProcess(Process):
             },
         }
 
-    def next_update(self, interval, states):
+    def next_update(self, timestep, states):
 
-        # get the states from the tellurium model
+        # get the states
         internal_A = states['internal']['A']
         external_A = states['external']['A']
 
-        # run tellurium here
-        internal_update = self.parameters['uptake_rate'] * external_A * interval
+        # calculate timestep-dependent updates
+        internal_update = self.parameters['parameter1'] * external_A * timestep
         external_update = -1 * internal_update
 
-        # get the results from tellurium
-        update = {
+        # return an update that mirrors the ports structure
+        return {
             'internal': {
                 'A': internal_update},
             'external': {
                 'A': external_update}
         }
 
-        # return an update that mirrors the ports structure
-        return update
 
+# functions to configure and run the process
+def test_template_process():
+    '''Run a simulation of the process.
 
-
-def test_tellurium():
-    totaltime = 10.0
-
-    # initialize the process
-    config = {}
-    tellurium_process = TelluriumProcess(config)
-
-    # declare the initial state, mirroring the ports structure
+    Returns:
+        The simulation output.
+    '''
+    
+    # 1.) Declare the initial state, mirroring the ports structure. May be passed as a parsable argument.
     initial_state = {
         'internal': {
             'A': 0.0
@@ -89,27 +90,48 @@ def test_tellurium():
             'A': 1.0
         },
     }
+    
+    # 2.) Create the simulation run parameters for the simulator
+    config = {
+        'parameter1': 4.0,
+    } 
+            
+    # 3.) Initialize the process by passing in a config dict
+    template_process = Template(config)
+    
+    # 4.) Get the ports for the process
+    template_process_ports = template_process.ports_schema()
 
-    ports = tellurium_process.ports_schema()
-    print('PORTS')
-    print(ports)
-
-    # make the simulation
+    # 4a.) view the ports:
+    print(f'PORTS FOR {pp(template_process)}: {pp(template_process_ports)}')
+    
+    #5.) Feed the Simulator Process instance you just created to the vivarium Engine
     sim = Engine(
-        processes={'tellurium_process': tellurium_process},
-        topology={'tellurium_process': {port_id: (port_id,) for port_id in ports.keys()}},
+        processes={
+            'template': template_process,
+        },
+        topology={
+            'template': {
+                port_id: (port_id,) for port_id in template_process_ports.keys()
+            },
+        },
         initial_state=initial_state
     )
-
-    # run the simulation
-    sim.update(totaltime)
-
-    # get the results
-    data = sim.emitter.get_data()
-
-    print(pp(data))
+    
+    #6.) Call update with that sim object, which calls the next_update method in the implementation you created above using total_time
+    total_time = 3
+    sim.update(
+        interval=total_time
+    )
+    
+    #7.) Get the data which is emitted from the sim object.
+    data = sim.emitter.get_timeseries()
+    
+    #7a.) Observe the data which is return from running the process:
+    print(f'RESULTS: {pp(data)}')
+    return data
 
 
 # run module with python template/processes/template_process.py
 if __name__ == '__main__':
-    test_tellurium()
+    test_template_process()
