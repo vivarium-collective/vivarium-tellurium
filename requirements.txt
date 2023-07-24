@@ -12,4 +12,5 @@
 #
 
 vivarium-core
-tellurium 
+tellurium
+pytest  

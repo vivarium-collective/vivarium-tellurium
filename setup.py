@@ -20,8 +20,6 @@ setup(
     author_email='',
     url='https://github.com/vivarium-collective/vivarium-tellurium',
     license='',
-    entry_points={
-        'console_scripts': []},
     short_description='A Vivarium interface for Tellurium',
     long_description=long_description,
     long_description_content_type='text/markdown',
