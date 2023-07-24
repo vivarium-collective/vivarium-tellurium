@@ -1,27 +1,54 @@
 '''
 Execute by running: ``python template/processes/template_process.py``
-
-TODO: Replace the template code to implement your own process. 
 '''
 
+from importlib import import_module
 from vivarium.core.process import Process
 from vivarium.core.engine import Engine, pp 
 
 
-class Template(Process):
+class TelluriumProcess(Process):
     '''
-    This mock process provides a basic template that can be used for a new process
+    Class which serves to be a Tellurium implementation of the `vivarium.core.processes.Process()` interface.
     '''
-
-    # declare default parameters as class variables
+    
     defaults = {
+        'api': 'tellurium',
+        'api_imports': [],
+        'model_file': '',
         'parameter1': 3.0,
     }
 
     def __init__(self, parameters=None):
-        # parameters passed into the constructor merge with the defaults
-        # and can be access through the self.parameters class variable
+        '''
+        A new instance of a `tellurium`-based implementation of the `vivarium.core.processes.Process() interface.
+        
+        Imports content from simulator (model) module. Parameters passed into the constructor merge with the defaults\n
+        and can be access through the self.parameters class variable.
+        
+        #### Parameters:
+        ----------------
+        parameters: `Dict`
+            configurations of the simulator process parameters. Defaults to `defaults`:\n
+                            `'api': 'tellurium',`
+                            `'api_imports': [],`
+                            `'model_file': '',`
+                            `'parameter1': 3.0,`
+                            
+        #### Returns:
+        -------------
+        `TelluriumProcess`
+            A generic instance of a Tellurium simulator process.
+        '''
         super().__init__(parameters)
+        
+        #get the module as an object (Tellurium)
+        te = import_module(self.parameters['api'])
+        
+        #set attributes with module object content
+        for i in self.parameters['api_imports']:
+            self.__setattr__(i, getattr(te, i))
+            
 
     def ports_schema(self):
         '''
@@ -74,7 +101,7 @@ class Template(Process):
 
 
 # functions to configure and run the process
-def test_template_process():
+def test_tellurium_process():
     '''Run a simulation of the process.
 
     Returns:
@@ -97,7 +124,7 @@ def test_template_process():
     } 
             
     # 3.) Initialize the process by passing in a config dict
-    template_process = Template(config)
+    template_process = TelluriumProcess(config)
     
     # 4.) Get the ports for the process
     template_process_ports = template_process.ports_schema()
@@ -134,4 +161,4 @@ def test_template_process():
 
 # run module with python template/processes/template_process.py
 if __name__ == '__main__':
-    test_template_process()
+    test_tellurium_process()
