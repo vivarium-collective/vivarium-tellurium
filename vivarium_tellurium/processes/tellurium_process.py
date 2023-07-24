@@ -1,6 +1,6 @@
 import json 
 from typing import Union
-import importlib
+from importlib import import_module
 import tellurium as te 
 from vivarium.core.process import Process
 from vivarium.core.engine import Engine, pp
@@ -12,13 +12,28 @@ class TelluriumProcess(Process):
     # declare default parameters as class variables
     defaults = {
         'api': 'tellurium',
+        'api_imports': [],
         'model_path': '',
     }
 
     def __init__(self, parameters=None):
-        # parameters passed into the constructor merge with the defaults
-        # and can be access through the self.parameters class variable
+        '''
+        A generic instance: Tellurium implementation of the `vivarium.core.processes.Process()` interface.
+        
+        Parameters passed into the constructor merge with the defaults and can be accessed through the `self.parameters` class attribute.
+        
+        #### Parameters:
+        ----------------
+            parameters:`Dict`
+                default setting parameters for this Tellurium instance. Defaults to`None`.
+        '''
         super().__init__(parameters)
+        
+        # import the necessary simulator api
+        module = import_module(self.parameters['api'])
+        # set the appropriate values from the given api content
+        for content in self.parameters['api_imports']:
+            self.__setattr__(content, getattr(module, content))
 
     def ports_schema(self):
         '''
