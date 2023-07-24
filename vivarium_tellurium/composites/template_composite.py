@@ -13,7 +13,7 @@ from vivarium.core.composer import Composer
 from vivarium.library.pretty import format_dict
 from vivarium.processes.injector import Injector
 
-from template.processes.template_process import Template
+from vivarium_tellurium.processes.tellurium_process import Template
 
 
 class TemplateComposer(Composer):
