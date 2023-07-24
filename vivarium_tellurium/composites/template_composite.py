@@ -6,14 +6,11 @@ Template Composite
 This is a toy composite that loads in two template processes and combines them.
 """
 
-# TODO: Delete this file before publishing your project.
 
 from vivarium.core.engine import Engine, pp
 from vivarium.core.composer import Composer
 from vivarium.library.pretty import format_dict
-from vivarium.processes.injector import Injector
-
-from vivarium_tellurium.processes.tellurium_process import Template
+from vivarium_tellurium.processes.tellurium_process import TelluriumProcess
 
 
 class TemplateComposer(Composer):
@@ -28,18 +25,24 @@ class TemplateComposer(Composer):
     }
 
     def __init__(self, config=None):
+        '''
+        This is a toy composite that loads in two template processes and combines them.
+        
+        The imported process that is used is the 
+        `vivarium_tellurium.processes.tellurium_process.TelluriumProcess()`object.
+        '''
         super().__init__(config)
 
     def generate_processes(self, config):
-        template1 = Template(self.config['template1'])
-        template2 = Template(self.config['template2'])
+        template1 = TelluriumProcess(self.config['template1'])
+        template2 = TelluriumProcess(self.config['template2'])
 
         return {
             'template1': template1,
             'template2': template2,
         }
 
-    def generate_topology(self, config):
+    def generate_topology(self, config=None):
         return {
             'template1': {
                 'internal': ('internal_1',),
