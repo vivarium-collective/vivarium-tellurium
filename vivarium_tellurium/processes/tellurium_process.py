@@ -2,10 +2,8 @@
 Execute by running: ``python template/processes/template_process.py``
 '''
 
-from importlib import import_module
 from vivarium.core.process import Process
 from vivarium.core.engine import Engine, pp
-
 import tellurium as te
 
 
@@ -15,12 +13,10 @@ class TelluriumProcess(Process):
     '''
     
     defaults = {
-        # 'api': 'tellurium',
-        'api_imports': [],
-        'model_file': '',
-        'parameter1': 3.0,
+        'sbml_model_file': None,
         'antimony_string': None,
         'exposed_species': None,  # list of exposed species ids
+        'parameter1': 3.0,
     }
 
     def __init__(self, config=None):
@@ -34,10 +30,11 @@ class TelluriumProcess(Process):
         ----------------
         parameters: `Dict`
             configurations of the simulator process parameters. Defaults to `defaults`:\n
-                            `'api': 'tellurium',`
-                            `'api_imports': [],`
-                            `'model_file': '',`
-                            `'parameter1': 3.0,`
+                             `'api_imports': [],`
+                             `'model_file': '',
+                             `'parameter1': 3.0,`
+                             `'antimony_string':`
+                             `'exposed_species':`
                             
         #### Returns:
         -------------
@@ -45,30 +42,18 @@ class TelluriumProcess(Process):
             A generic instance of a Tellurium simulator process.
         '''
         super().__init__(config)
-
+        
+        # initialize a tellurium(roadrunner) simulation object. Load the model in.
         if self.parameters.get('antimony_string'):
-            pass
+            self.simulator = te.loada(self.parameters['antimony_string'])
+        else:
+            self.simulator = te.loadSBMLModel(self.parameters['sbml_model_file'])
 
-        # initialize a tellurium simulation object. Load the model in. Extract the variables.
-        self.tellurium_object = te.load()
-
-        self.species = self.tellurium_object.get_species()
+        # extract the variables 
+        self.species = self.simulator.get_species() # PLACEHOLDER!!!!!!!!
         
 
     def ports_schema(self):
-        '''
-        ports_schema returns a dictionary that declares how each state will behave.
-        Each key can be assigned settings for the schema_keys declared in Store:
-
-        * `_default`
-        * `_updater`
-        * `_divider`
-        * `_value`
-        * `_properties`
-        * `_emit`
-        * `_serializer`
-        '''
-
         # TODO -- need to set the ports/variables according to self.config assignments. Similar to viv-biosimul
         species_schema = {
             species_id: {
@@ -163,9 +148,10 @@ def test_load_from_antimony():
     }
 
     # 3.) Initialize the process by passing in a config dict
-    template_process = TelluriumProcess.init_from_antimony(config)
+    antimony_process = TelluriumProcess.init_from_antimony(config)
 
 
 # run module with python template/processes/template_process.py
 if __name__ == '__main__':
     test_tellurium_process()
+    
