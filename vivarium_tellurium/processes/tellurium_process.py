@@ -4,7 +4,9 @@ Execute by running: ``python template/processes/template_process.py``
 
 from importlib import import_module
 from vivarium.core.process import Process
-from vivarium.core.engine import Engine, pp 
+from vivarium.core.engine import Engine, pp
+
+import tellurium as te
 
 
 class TelluriumProcess(Process):
@@ -13,13 +15,15 @@ class TelluriumProcess(Process):
     '''
     
     defaults = {
-        'api': 'tellurium',
+        # 'api': 'tellurium',
         'api_imports': [],
         'model_file': '',
         'parameter1': 3.0,
+        'antimony_string': None,
+        'exposed_species': None,  # list of exposed species ids
     }
 
-    def __init__(self, parameters=None):
+    def __init__(self, config=None):
         '''
         A new instance of a `tellurium`-based implementation of the `vivarium.core.processes.Process() interface.
         
@@ -40,15 +44,16 @@ class TelluriumProcess(Process):
         `TelluriumProcess`
             A generic instance of a Tellurium simulator process.
         '''
-        super().__init__(parameters)
+        super().__init__(config)
+
+        if self.parameters.get('antimony_string'):
+            pass
+
+        # initialize a tellurium simulation object. Load the model in. Extract the variables.
+        self.tellurium_object = te.load()
+
+        self.species = self.tellurium_object.get_species()
         
-        #get the module as an object (Tellurium)
-        te = import_module(self.parameters['api'])
-        
-        #set attributes with module object content
-        for i in self.parameters['api_imports']:
-            self.__setattr__(i, getattr(te, i))
-            
 
     def ports_schema(self):
         '''
@@ -64,40 +69,33 @@ class TelluriumProcess(Process):
         * `_serializer`
         '''
 
-        return {
-            'internal': {
-                'A': {
+        # TODO -- need to set the ports/variables according to self.config assignments. Similar to viv-biosimul
+        species_schema = {
+            species_id: {
                     '_default': 1.0,
-                    '_updater': 'accumulate',
+                    '_updater': 'set',
                     '_emit': True,
-                },
-            },
-            'external': {
-                'A': {
-                    '_default': 1.0,
-                    '_updater': 'accumulate',
-                    '_emit': True,
-                },
-            },
+                } for species_id in self.config['exposed_species']
         }
 
-    def next_update(self, timestep, states):
-
-        # get the states
-        internal_A = states['internal']['A']
-        external_A = states['external']['A']
-
-        # calculate timestep-dependent updates
-        internal_update = self.parameters['parameter1'] * external_A * timestep
-        external_update = -1 * internal_update
-
-        # return an update that mirrors the ports structure
         return {
-            'internal': {
-                'A': internal_update},
-            'external': {
-                'A': external_update}
+            'species': species_schema
         }
+
+    def next_update(self, interval, states):
+
+        # set the states in tellurium according to what is passing in states
+        for species_id, value in states['species'].items():
+            self.tellurium_object.set_species(species_id, value)
+
+        # run the simulation
+        self.tellurium_object.simulate(0, interval, 1)
+
+        # extract the results. TODO -- get the final values of the self.config['exposed_species'] and put them in the update
+        update = {'species': {}}
+        results = self.tellurium_object.get_data()
+
+        return update
 
 
 # functions to configure and run the process
@@ -157,6 +155,15 @@ def test_tellurium_process():
     #7a.) Observe the data which is return from running the process:
     print(f'RESULTS: {pp(data)}')
     return data
+
+
+def test_load_from_antimony():
+    config = {
+        'antimony_string': ''
+    }
+
+    # 3.) Initialize the process by passing in a config dict
+    template_process = TelluriumProcess.init_from_antimony(config)
 
 
 # run module with python template/processes/template_process.py
