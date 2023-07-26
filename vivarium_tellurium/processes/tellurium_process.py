@@ -46,7 +46,7 @@ class TelluriumProcess(Process):
         if self.parameters.get('antimony_string'):
             self.simulator = te.loada(self.parameters['antimony_string'])
         else:
-            self.simulator = te.loadSBMLModel(self.parameters['sbml_model_file'])
+            self.simulator = te.loadSBMLModel(self.parameters['sbml_model_path'])
 
         # extract the variables 
         self.species = self.simulator.get_species() # PLACEHOLDER!!!!!!!!
