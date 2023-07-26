@@ -13,7 +13,7 @@ class TelluriumProcess(Process):
     '''
     
     defaults = {
-        'sbml_model_file': None,
+        'sbml_model_path': '',
         'antimony_string': None,
         'exposed_species': None,  # list of exposed species ids
         'parameter1': 3.0,
@@ -23,27 +23,26 @@ class TelluriumProcess(Process):
         '''
         A new instance of a `tellurium`-based implementation of the `vivarium.core.processes.Process() interface.
         
-        Imports content from simulator (model) module. Parameters passed into the constructor merge with the defaults\n
-        and can be access through the self.parameters class variable.
+        Instantiates a `roadrunner` simulator instance using either `SBML`(default,`file`) or `antimony`(optional,`str`)
         
         #### Parameters:
         ----------------
         parameters: `Dict`
             configurations of the simulator process parameters. Defaults to `defaults`:\n
-                             `'api_imports': [],`
-                             `'model_file': '',
-                             `'parameter1': 3.0,`
-                             `'antimony_string':`
-                             `'exposed_species':`
+                            `'sbml_model_file': ''`
+                            `'antimony_string': None`
+                            `'exposed_species': None`  # list of exposed species ids
+                            `'parameter1': 3.0`
                             
         #### Returns:
         -------------
         `TelluriumProcess`
             A generic instance of a Tellurium simulator process.
         '''
+        
         super().__init__(config)
         
-        # initialize a tellurium(roadrunner) simulation object. Load the model in.
+        # initialize a tellurium(roadrunner) simulation object. Load the model in using either sbml(default) or antimony
         if self.parameters.get('antimony_string'):
             self.simulator = te.loada(self.parameters['antimony_string'])
         else:
@@ -85,12 +84,13 @@ class TelluriumProcess(Process):
 
 # functions to configure and run the process
 def test_tellurium_process():
-    '''Run a simulation of the process.
+    '''
+    Run a test simulation process. Loaded using SBML.
 
     Returns:
         The simulation output.
     '''
-    
+    sbml_model_path = 'vivarium_tellurium/library/Caravagna-J-Theor-Biol-2010-tumor-suppressive-oscillations/Caravagna2010.xml'
     # 1.) Declare the initial state, mirroring the ports structure. May be passed as a parsable argument.
     initial_state = {
         'internal': {
@@ -103,6 +103,7 @@ def test_tellurium_process():
     
     # 2.) Create the simulation run parameters for the simulator
     config = {
+        'sbml_model_path': sbml_model_path,
         'parameter1': 4.0,
     } 
             
@@ -144,11 +145,12 @@ def test_tellurium_process():
 
 def test_load_from_antimony():
     config = {
-        'antimony_string': ''
+        'antimony_string': 'S1 -> S2; k1*S1'
     }
 
     # 3.) Initialize the process by passing in a config dict
-    antimony_process = TelluriumProcess.init_from_antimony(config)
+    antimony_process = TelluriumProcess(config)
+    print(antimony_process.simulator)
 
 
 # run module with python template/processes/template_process.py
