@@ -144,11 +144,12 @@ def test_tellurium_process():
 
 
 def test_load_from_antimony():
+    # 1.) Adding an antimony string to your config dict will allow for "antimony mode" to be turned on.
     config = {
         'antimony_string': 'S1 -> S2; k1*S1'
     }
 
-    # 3.) Initialize the process by passing in a config dict
+    # 2.) Initialize the process by passing in a config dict
     antimony_process = TelluriumProcess(config)
     print(antimony_process.simulator)
 
@@ -156,4 +157,5 @@ def test_load_from_antimony():
 # run module with python template/processes/template_process.py
 if __name__ == '__main__':
     test_tellurium_process()
+    test_load_from_antimony()
     
