@@ -3,7 +3,7 @@ Execute by running: ``python vivarium_tellurium/processes/tellurium_process.py`
 """
 
 from vivarium.core.process import Process
-from vivarium.core.engine import Engine, pp
+from vivarium.core.engine import Engine, pf
 import tellurium as te
 
 
@@ -13,7 +13,6 @@ class TelluriumProcess(Process):
     defaults = {
         'sbml_model_path': '',
         'antimony_string': None,
-        # 'exposed_species': None,  # list of exposed species ids
     }
 
     def __init__(self, config=None):
@@ -25,7 +24,23 @@ class TelluriumProcess(Process):
         else:
             self.simulator = te.loadSBMLModel(self.parameters['sbml_model_path'])
 
-        # extract the variables 
+        # TODO -- make this configurable.
+        self.input_ports = [
+            'floating_species',
+            'boundary_species',
+            # 'time',
+            # 'compartments',
+            # 'parameters',
+            # 'stoichiometries',
+        ]
+
+        self.output_ports = [
+            'floating_species',
+            # 'time',
+        ]
+
+        # extract the variables
+        # TODO -- get these according to ports
         self.floating_species_list = self.simulator.getFloatingSpeciesIds()
         self.boundary_species_list = self.simulator.getBoundarySpeciesIds()
         self.floating_species_initial = self.simulator.getFloatingSpeciesConcentrations()
@@ -42,6 +57,11 @@ class TelluriumProcess(Process):
 
     def ports_schema(self):
         return {
+            'time': {
+                '_default': 0.0,
+                '_updater': 'set',
+                '_emit': True,
+            },
             'floating_species': {
                 species_id: {
                     '_default': 1.0,
@@ -57,28 +77,29 @@ class TelluriumProcess(Process):
                 } for species_id in self.boundary_species_list
             },
             'reactions': {
-                '_default': self.reaction_list},
+                '_default': self.reaction_list
+            },
         }
 
     def next_update(self, interval, states):
 
-        # set the states in tellurium according to what is passing in states
-        for species_id, value in states['floating_species'].items():
-            self.simulator.setValue(species_id, value)
-        for species_id, value in states['boundary_species'].items():
-            self.simulator.setValue(species_id, value)
+        # set tellurium values according to what is passed in states
+        for port_id, values in states.items():
+            if port_id in self.input_ports:  # only update from input ports
+                for cat_id, value in values.items():
+                    self.simulator.setValue(cat_id, value)
 
         # run the simulation
-        self.simulator.simulate(0, interval, 2)
+        new_time = self.simulator.oneStep(states['time'], interval)
 
-        # extract the results
-        final_concentrations = self.simulator.getFloatingSpeciesConcentrations()
-
-        # convert to an update and return
-        floating_species_dict = dict(zip(self.floating_species_list, final_concentrations))
-        return {
-            'floating_species': floating_species_dict
-        }
+        # extract the results and convert to update
+        update = {'time': new_time}
+        for port_id, values in states.items():
+            if port_id in self.output_ports:
+                update[port_id] = {}
+                for cat_id in values.keys():
+                    update[port_id][cat_id] = self.simulator.getValue(cat_id)
+        return update
 
 
 # functions to configure and run the process
@@ -122,7 +143,7 @@ def test_tellurium_process():
     data = sim.emitter.get_timeseries()
     
     # Observe the data which is return from running the process:
-    print(f'RESULTS: {pp(data)}')
+    print(f'RESULTS: {pf(data)}')
 
 
 # def test_load_from_antimony():
