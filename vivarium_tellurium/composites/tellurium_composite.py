@@ -3,54 +3,15 @@
 Tellurium Composite
 ==================
 """
-from vivarium.core.engine import Engine, pp
-from vivarium.core.composer import Composer
-from vivarium.library.pretty import format_dict
+from vivarium.core.engine import Engine, pf
+from vivarium.core.composer import Composite
 from vivarium_tellurium.processes.tellurium_process import TelluriumProcess
-
-
-class TelluriumComposer(Composer):
-
-    defaults = {
-        'te1': {
-            'sbml_model_path': 'vivarium_tellurium/models/BIOMD0000000061_url.xml',
-        },
-        'te2': {
-            'sbml_model_path': 'vivarium_tellurium/models/BIOMD0000000061_url.xml',
-        },
-    }
-
-    def __init__(self, config=None):
-        super().__init__(config)
-
-    def generate_processes(self, config):
-        te1 = TelluriumProcess(self.config['te1'])
-        te2 = TelluriumProcess(self.config['te1'])
-
-        return {
-            'te1': te1,
-            'te2': te2,
-        }
-
-    def generate_topology(self, config=None):
-        return {
-            'te1': {
-                'floating_species': ('floating_species_1',),
-                'boundary_species': ('boundary_species_1',),
-                'reactions': ('reactions_1',),
-            },
-            'te2': {
-                'floating_species': ('floating_species_2',),
-                'boundary_species': ('boundary_species_2',),
-                'reactions': ('reactions_2',),
-            },
-        }
 
 
 def test_tellurium_composite():
     total_time = 3
 
-    # set config (this is also the default)
+    # set config
     config = {
         'te1': {
             'sbml_model_path': 'vivarium_tellurium/models/BIOMD0000000061_url.xml',
@@ -60,11 +21,28 @@ def test_tellurium_composite():
         },
     }
 
-    # Initialize the composer by passing in a config dict
-    te_composer = TelluriumComposer(config)
+    # make the processes
+    processes = {
+        'te1': TelluriumProcess(config['te1']),
+        'te2': TelluriumProcess(config['te1']),
+    }
 
+    topology = {
+        'te1': {
+            'floating_species': ('floating_species_1',),
+            'boundary_species': ('boundary_species_1',),
+            'reactions': ('reactions_1',),
+        },
+        'te2': {
+            'floating_species': ('floating_species_2',),
+            'boundary_species': ('boundary_species_2',),
+            'reactions': ('reactions_2',),
+        },
+    }
     # Generate a composite by calling the Composers' generate method
-    te_composite = te_composer.generate()
+    te_composite = Composite({
+        'processes': processes,
+        'topology': topology})
 
     # Get the initial state
     initial_state = te_composite.initial_state()
@@ -81,8 +59,10 @@ def test_tellurium_composite():
     # Get the data which is emitted from the sim object.
     data = sim.emitter.get_timeseries()
 
+
     # Observe the data which is return from running the process:
-    print(f'RESULTS: {pp(data)}')
+    print(f'Top-level stores: {list(data.keys())}')
+    print(f'RESULTS: {pf(data)}')
 
 
 # run module with python vivarium_tellurium/processes/tellurium_composite.py
