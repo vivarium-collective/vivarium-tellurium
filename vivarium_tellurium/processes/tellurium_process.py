@@ -8,28 +8,12 @@ import tellurium as te
 
 
 class TelluriumProcess(Process):
-    """Vivarium Process interface for Tellurium.
-
-    Instantiates a `roadrunner` simulator instance using either `SBML`(default,`file`) or `antimony`(optional,`str`)
-
-        #### Parameters:
-        ----------------
-        parameters: `Dict`
-            configurations of the simulator process parameters. Defaults to `defaults`:\n
-                            `'sbml_model_file': ''`
-                            `'antimony_string': None`
-                            `'exposed_species': None`  # list of exposed species ids
-
-        #### Returns:
-        -------------
-        `TelluriumProcess`
-            A generic instance of a Tellurium simulator process.
-    """
+    """Vivarium Process interface for Tellurium"""
     
     defaults = {
         'sbml_model_path': '',
         'antimony_string': None,
-        'exposed_species': None,  # list of exposed species ids
+        # 'exposed_species': None,  # list of exposed species ids
     }
 
     def __init__(self, config=None):
@@ -57,7 +41,6 @@ class TelluriumProcess(Process):
         }
 
     def ports_schema(self):
-        # TODO -- set the ports/variables according to self.config assignments. Similar to viv-biosimul
         return {
             'floating_species': {
                 species_id: {
@@ -88,10 +71,10 @@ class TelluriumProcess(Process):
         # run the simulation
         self.simulator.simulate(0, interval, 2)
 
-        # extract the results. TODO -- get the final values of the self.config['exposed_species'] and put them in the update
+        # extract the results
         final_concentrations = self.simulator.getFloatingSpeciesConcentrations()
 
-
+        # convert to an update and return
         floating_species_dict = dict(zip(self.floating_species_list, final_concentrations))
         return {
             'floating_species': floating_species_dict
