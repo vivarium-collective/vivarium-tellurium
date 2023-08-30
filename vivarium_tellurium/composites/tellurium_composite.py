@@ -1,12 +1,8 @@
 """
 ==================
-Template Composite
+Tellurium Composite
 ==================
-
-This is a toy composite that loads in two template processes and combines them.
 """
-
-
 from vivarium.core.engine import Engine, pp
 from vivarium.core.composer import Composer
 from vivarium.library.pretty import format_dict
@@ -53,7 +49,16 @@ class TelluriumComposer(Composer):
 
 def test_tellurium_composite():
     total_time = 3
-    config = {}
+
+    # set config (this is also the default)
+    config = {
+        'te1': {
+            'sbml_model_path': 'vivarium_tellurium/models/BIOMD0000000061_url.xml',
+        },
+        'te2': {
+            'sbml_model_path': 'vivarium_tellurium/models/BIOMD0000000061_url.xml',
+        },
+    }
 
     # Initialize the composer by passing in a config dict
     te_composer = TelluriumComposer(config)
