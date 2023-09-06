@@ -13,7 +13,7 @@ class TelluriumProcess(Process):
     """Vivarium Process interface for Tellurium"""
     
     defaults = {
-        'sbml_model_path': '',
+        'sbml_model_path': None,
         'antimony_string': None,
     }
 
@@ -21,10 +21,12 @@ class TelluriumProcess(Process):
         super().__init__(config)
         
         # initialize a tellurium(roadrunner) simulation object. Load the model in using either sbml(default) or antimony
-        if self.parameters.get('antimony_string'):
+        if self.parameters.get('antimony_string') and not self.parameters.get('sbml_model_path'):
             self.simulator = te.loada(self.parameters['antimony_string'])
-        else:
+        elif self.parameters.get('sbml_model_path') and not self.parameters.get('antimony_string'):
             self.simulator = te.loadSBMLModel(self.parameters['sbml_model_path'])
+        else:
+            raise Exception('the config requires either an "antimony_string" or an "sbml_model_path"')
 
         # TODO -- make this configurable.
         self.input_ports = [
@@ -119,11 +121,11 @@ class TelluriumProcess(Process):
         return update
 
 
-# functions to configure and run the process
+# functions to test the process
 def test_tellurium_process():
     total_time = 10.0
     time_step = 0.1
-    sbml_model_path = 'vivarium_tellurium/models/BIOMD0000000061_url.xml'  # Caravagna2010.xml'
+    sbml_model_path = 'vivarium_tellurium/models/BIOMD0000000061_url.xml'
 
     # Create the simulation run parameters for the simulator
     config = {
@@ -140,7 +142,7 @@ def test_tellurium_process():
     # Get the initial state
     initial_state = te_process.initial_state()
 
-    # Feed the Simulator Process you just created to the vivarium Engine
+    # Put the process in the vivarium Engine
     sim = Engine(
         processes={
             'te': te_process,
@@ -154,15 +156,15 @@ def test_tellurium_process():
         global_time_precision=5,
     )
     
-    # Call update with that sim object, which calls the next_update method in the implementation you created above using total_time
+    # Run the simulation
     sim.update(
         interval=total_time
     )
     
-    # Get the data which is emitted from the sim object.
+    # Retrieve the simulation output
     data = sim.emitter.get_timeseries()
     
-    # Observe the data which is return from running the process:
+    # Print the results
     custom_pretty_print(data)
 
     # Plot output
@@ -187,4 +189,3 @@ def test_tellurium_process():
 if __name__ == '__main__':
     test_tellurium_process()
     # test_load_from_antimony()
-    
